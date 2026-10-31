@@ -30,10 +30,14 @@ module.exports = async (req, res) => {
         _captcha: "false",
       }),
     });
-    const d = await r.json().catch(() => ({}));
+    const text = await r.text();
+    let d = {};
+    try { d = JSON.parse(text); } catch (_) {}
     const ok = d.success === true || d.success === "true";
+    if (!ok) console.error("FormSubmit rejected", r.status, text.slice(0, 500));
     return res.status(ok ? 200 : 502).json({ ok, info: d.message || null });
   } catch (e) {
+    console.error("FormSubmit request failed", e && e.message);
     return res.status(502).json({ ok: false });
   }
 };
