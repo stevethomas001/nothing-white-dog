@@ -1,7 +1,10 @@
 // Contact form handler: sends the message via Resend from our own domain.
 // The recipient and API key live only on the server, never in the page.
 const TO = process.env.CONTACT_TO || "steve@edge.com.au";
-const FROM = process.env.CONTACT_FROM || "Nuffin dog <noreply@edge.com.au>";
+// Senders tried in order: Resend's test sender first, then the verified domain.
+const FROMS = (process.env.CONTACT_FROM ||
+  "Nuffin dog <onboarding@resend.dev>,Nuffin dog <noreply@quietclosing.com.au>")
+  .split(",").map((s) => s.trim()).filter(Boolean);
 
 const esc = (s) =>
   String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -20,15 +23,27 @@ module.exports = async (req, res) => {
     console.error("RESEND_API_KEY is not set");
     return res.status(500).json({ ok: false });
   }
-  try {
-    const r = await fetch("https://api.resend.com/emails", {
+  for (const from of FROMS) {
+    try {
+      const r = await send(from, email, message);
+      if (r.ok) return res.status(200).json({ ok: true });
+      console.error("Resend rejected", from, r.status, (await r.text()).slice(0, 500));
+    } catch (e) {
+      console.error("Resend request failed", from, e && e.message);
+    }
+  }
+  return res.status(502).json({ ok: false });
+};
+
+function send(from, email, message) {
+  return fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
         Authorization: "Bearer " + process.env.RESEND_API_KEY,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: FROM,
+        from,
         to: [TO],
         reply_to: email,
         subject: "New message from your website",
@@ -38,13 +53,4 @@ module.exports = async (req, res) => {
           '<p style="font-family:monospace;white-space:pre-wrap">' + esc(message) + "</p>",
       }),
     });
-    if (!r.ok) {
-      console.error("Resend rejected", r.status, (await r.text()).slice(0, 500));
-      return res.status(502).json({ ok: false });
-    }
-    return res.status(200).json({ ok: true });
-  } catch (e) {
-    console.error("Resend request failed", e && e.message);
-    return res.status(502).json({ ok: false });
-  }
-};
+}
