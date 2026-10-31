@@ -142,8 +142,8 @@
         form.style.display = "none";
         sent.textContent = "Sent. Nuffin dog will be in touch.";
         sent.classList.add("done");
-        document.getElementById("dogSit").hidden = true;
-        document.getElementById("dogWee").hidden = false;
+        document.getElementById("dogSit").setAttribute("hidden", "");
+        document.getElementById("dogWee").removeAttribute("hidden");
         window.scrollTo({ top: 0, behavior: "smooth" });
       } else { throw new Error(d.message || "failed"); }
     })
