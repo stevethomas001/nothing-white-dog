@@ -85,8 +85,8 @@
   <footer>Black page &middot; white dog</footer>
 
 <script>
-  // Messages are emailed to this address via FormSubmit (no mail app needed).
-  var ENDPOINT = "https://formsubmit.co/ajax/steve@edge.com.au";
+  // Sent to our own server function; the recipient is never exposed here.
+  var ENDPOINT = "/api/contact";
   var form = document.getElementById("msg");
   var sent = document.getElementById("sent");
   var btn = form.querySelector("button");
@@ -98,18 +98,11 @@
     fetch(ENDPOINT, {
       method: "POST",
       headers: { "Content-Type": "application/json", "Accept": "application/json" },
-      body: JSON.stringify({
-        email: from,
-        message: body,
-        _subject: "New message from your website",
-        _replyto: from,
-        _template: "table",
-        _captcha: "false"
-      })
+      body: JSON.stringify({ email: from, message: body })
     })
     .then(function (r) { return r.json(); })
     .then(function (d) {
-      if (d.success === "true" || d.success === true) {
+      if (d.ok) {
         form.style.display = "none";
         sent.textContent = "Received. We'll be in touch.";
       } else { throw new Error(d.message || "failed"); }
