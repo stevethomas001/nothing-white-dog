@@ -80,21 +80,45 @@
     <textarea id="body" name="body" required></textarea>
     <button type="submit">Send us a message</button>
   </form>
-  <p class="sent" id="sent">Message ready in your mail app. Hit send.</p>
+  <p class="sent" id="sent" role="status"></p>
 
   <footer>Black page &middot; white dog</footer>
 
 <script>
-  // Address messages are delivered to — change this to your own.
-  var TO = "steve@edge.com.au";
-  document.getElementById("msg").addEventListener("submit", function (e) {
+  // Messages are emailed to this address via FormSubmit (no mail app needed).
+  var ENDPOINT = "https://formsubmit.co/ajax/steve@edge.com.au";
+  var form = document.getElementById("msg");
+  var sent = document.getElementById("sent");
+  var btn = form.querySelector("button");
+  form.addEventListener("submit", function (e) {
     e.preventDefault();
     var from = document.getElementById("from").value;
     var body = document.getElementById("body").value;
-    location.href = "mailto:" + TO +
-      "?subject=" + encodeURIComponent("Message from " + from) +
-      "&body=" + encodeURIComponent(body + "\n\n— " + from);
-    document.getElementById("sent").style.display = "block";
+    btn.disabled = true; btn.textContent = "Sending…";
+    fetch(ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Accept": "application/json" },
+      body: JSON.stringify({
+        email: from,
+        message: body,
+        _subject: "New message from your website",
+        _replyto: from,
+        _template: "table",
+        _captcha: "false"
+      })
+    })
+    .then(function (r) { return r.json(); })
+    .then(function (d) {
+      if (d.success === "true" || d.success === true) {
+        form.style.display = "none";
+        sent.textContent = "Received. We'll be in touch.";
+      } else { throw new Error(d.message || "failed"); }
+    })
+    .catch(function () {
+      btn.disabled = false; btn.textContent = "Send us a message";
+      sent.textContent = "Couldn't send. Try again in a moment.";
+    })
+    .finally(function () { sent.style.display = "block"; });
   });
 </script>
 </body>
