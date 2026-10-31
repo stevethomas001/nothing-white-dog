@@ -39,13 +39,41 @@
   button:hover { opacity:.8; }
   .sent { margin-top:56px; color:var(--dim); display:none; }
   footer { margin-top:72px; font-size:11px; letter-spacing:.2em; color:#444; text-transform:uppercase; }
-  @media (prefers-reduced-motion: reduce) { .dog, .tail { animation:none; } }
+  .dog[hidden] { display:none; }
+  .wee { animation:flow .5s linear infinite; }
+  @keyframes flow { to { stroke-dashoffset:-11; } }
+  .sent.done { color:var(--fg); font-size:clamp(16px,2.6vw,20px); letter-spacing:.02em; }
+  @media (prefers-reduced-motion: reduce) { .dog, .tail, .wee { animation:none; } }
 </style>
 </head>
 <body>
 
+  <!-- after sending: the dog, leg up, marking the occasion -->
+  <svg class="dog" id="dogWee" viewBox="0 0 240 180" role="img" aria-label="A white dog cocking its leg" hidden>
+    <g fill="#fff">
+      <rect x="216" y="96" width="14" height="70" rx="3"/>
+      <rect x="212" y="90" width="22" height="10" rx="5"/>
+      <path d="M150 74 C158 54 156 36 148 28 C142 24 138 30 143 37 C149 48 146 62 138 70 Z"/>
+      <ellipse cx="124" cy="96" rx="56" ry="28"/>
+      <rect x="151" y="96" width="15" height="54" rx="7.5" transform="rotate(-138 158.5 103)"/>
+      <rect x="140" y="104" width="15" height="58" rx="7.5"/>
+      <rect x="78" y="104" width="15" height="58" rx="7.5"/>
+      <rect x="98" y="108" width="15" height="54" rx="7.5"/>
+      <path d="M70 100 C62 84 60 72 66 60 L92 74 C88 84 86 92 88 104 Z"/>
+      <ellipse cx="62" cy="58" rx="26" ry="22"/>
+      <ellipse cx="38" cy="66" rx="17" ry="11"/>
+      <path d="M58 40 C50 24 54 14 62 18 C70 22 74 34 72 42 Z"/>
+    </g>
+    <g fill="#000">
+      <circle cx="58" cy="52" r="3.4"/>
+      <ellipse cx="23" cy="63" rx="5.5" ry="4.2"/>
+    </g>
+    <path class="wee" d="M170 108 Q196 100 214 128" fill="none" stroke="#f2d43d" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="6 5"/>
+    <ellipse cx="214" cy="167" rx="22" ry="4" fill="#f2d43d" opacity=".85"/>
+  </svg>
+
   <!-- original white dog, sitting -->
-  <svg class="dog" viewBox="0 0 200 180" role="img" aria-label="A white dog sitting">
+  <svg class="dog" id="dogSit" viewBox="0 0 200 180" role="img" aria-label="A white dog sitting">
     <g fill="#fff">
       <path class="tail" d="M150 120 C170 110 178 92 172 80 C168 74 162 78 164 86 C166 98 156 108 146 112 Z"/>
       <ellipse cx="110" cy="128" rx="44" ry="40"/>
@@ -112,7 +140,11 @@
     .then(function (d) {
       if (d.success) {
         form.style.display = "none";
-        sent.textContent = "Received. We'll be in touch.";
+        sent.textContent = "Sent. Nuffin dog will be in touch.";
+        sent.classList.add("done");
+        document.getElementById("dogSit").hidden = true;
+        document.getElementById("dogWee").hidden = false;
+        window.scrollTo({ top: 0, behavior: "smooth" });
       } else { throw new Error(d.message || "failed"); }
     })
     .catch(function () {
