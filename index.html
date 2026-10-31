@@ -85,8 +85,10 @@
   <footer>Black page &middot; white dog</footer>
 
 <script>
-  // Sent to our own server function; the recipient is never exposed here.
-  var ENDPOINT = "/api/contact";
+  // Delivered by Web3Forms. The access key only allows sending to our inbox;
+  // the recipient address itself never appears in this page.
+  var ENDPOINT = "https://api.web3forms.com/submit";
+  var ACCESS_KEY = "592bc131-4059-4f56-a91b-1bb4adf40403";
   var form = document.getElementById("msg");
   var sent = document.getElementById("sent");
   var btn = form.querySelector("button");
@@ -98,11 +100,17 @@
     fetch(ENDPOINT, {
       method: "POST",
       headers: { "Content-Type": "application/json", "Accept": "application/json" },
-      body: JSON.stringify({ email: from, message: body })
+      body: JSON.stringify({
+        access_key: ACCESS_KEY,
+        subject: "New message from your website",
+        from_name: "Nothing. website",
+        email: from,
+        message: body
+      })
     })
     .then(function (r) { return r.json(); })
     .then(function (d) {
-      if (d.ok) {
+      if (d.success) {
         form.style.display = "none";
         sent.textContent = "Received. We'll be in touch.";
       } else { throw new Error(d.message || "failed"); }
