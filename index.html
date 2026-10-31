@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nothing.</title>
+<meta name="description" content="We build websites. No more, no less.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23000'/%3E%3Ccircle cx='50' cy='50' r='22' fill='%23fff'/%3E%3C/svg%3E">
+<style>
+  :root { --bg:#000; --fg:#fff; --dim:#8a8a8a; --line:#2a2a2a; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html,body { background:var(--bg); color:var(--fg); }
+  body {
+    min-height:100vh; min-height:100dvh;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:48px 16px; text-align:center; -webkit-font-smoothing:antialiased;
+  }
+  .dog { width:min(220px,55vw); height:auto; margin-bottom:40px; animation:breathe 5s ease-in-out infinite; }
+  .tail { transform-origin:156px 92px; animation:wag 1.6s ease-in-out infinite; }
+  @keyframes breathe { 50% { transform:translateY(-3px); } }
+  @keyframes wag { 0%,100% { transform:rotate(0) } 50% { transform:rotate(-14deg) } }
+  h1 { font-size:clamp(40px,10vw,88px); font-weight:700; letter-spacing:-0.04em; line-height:1; }
+  .lines { margin-top:28px; display:grid; gap:10px; font-size:clamp(14px,2.2vw,17px); line-height:1.5; }
+  .lines .dim { color:var(--dim); }
+  form { margin-top:56px; width:100%; max-width:440px; display:grid; gap:12px; text-align:left; }
+  label { font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:var(--dim); }
+  input, textarea {
+    width:100%; background:transparent; color:var(--fg); border:0; border-bottom:1px solid var(--line);
+    padding:10px 0; font:inherit; font-size:16px; outline:none; transition:border-color .2s;
+  }
+  input:focus, textarea:focus { border-color:var(--fg); }
+  textarea { resize:vertical; min-height:90px; }
+  button {
+    margin-top:12px; justify-self:start; background:var(--fg); color:var(--bg); border:0;
+    font:inherit; font-size:13px; letter-spacing:.2em; text-transform:uppercase;
+    padding:14px 26px; cursor:pointer; transition:opacity .2s;
+  }
+  button:hover { opacity:.8; }
+  .sent { margin-top:56px; color:var(--dim); display:none; }
+  footer { margin-top:72px; font-size:11px; letter-spacing:.2em; color:#444; text-transform:uppercase; }
+  @media (prefers-reduced-motion: reduce) { .dog, .tail { animation:none; } }
+</style>
+</head>
+<body>
+
+  <!-- original white dog, sitting -->
+  <svg class="dog" viewBox="0 0 200 180" role="img" aria-label="A white dog sitting">
+    <g fill="#fff">
+      <path class="tail" d="M150 120 C170 110 178 92 172 80 C168 74 162 78 164 86 C166 98 156 108 146 112 Z"/>
+      <ellipse cx="110" cy="128" rx="44" ry="40"/>
+      <rect x="70" y="140" width="22" height="34" rx="11"/>
+      <rect x="104" y="146" width="22" height="28" rx="11"/>
+      <ellipse cx="140" cy="166" rx="20" ry="10"/>
+      <path d="M72 108 C70 84 74 66 84 56 L104 70 C100 86 98 100 100 116 Z"/>
+      <ellipse cx="80" cy="50" rx="30" ry="27"/>
+      <ellipse cx="54" cy="60" rx="18" ry="13"/>
+      <path d="M64 30 C56 14 60 4 68 8 C76 12 80 24 78 32 Z"/>
+      <path d="M92 28 C96 12 106 6 110 14 C112 22 106 30 98 34 Z"/>
+    </g>
+    <g fill="#000">
+      <circle cx="74" cy="46" r="3.6"/>
+      <circle cx="94" cy="44" r="3.6"/>
+      <ellipse cx="40" cy="58" rx="6" ry="4.5"/>
+    </g>
+  </svg>
+
+  <h1>Nothing.</h1>
+
+  <div class="lines">
+    <p>We build websites.</p>
+    <p class="dim">You arrived here because you saw one we built.</p>
+    <p>No more, no less.</p>
+  </div>
+
+  <form id="msg" name="msg">
+    <label for="from">Your email</label>
+    <input id="from" name="from" type="email" required autocomplete="email">
+    <label for="body">Message</label>
+    <textarea id="body" name="body" required></textarea>
+    <button type="submit">Send us a message</button>
+  </form>
+  <p class="sent" id="sent">Message ready in your mail app. Hit send.</p>
+
+  <footer>Black page &middot; white dog</footer>
+
+<script>
+  // Address messages are delivered to — change this to your own.
+  var TO = "steve@edge.com.au";
+  document.getElementById("msg").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var from = document.getElementById("from").value;
+    var body = document.getElementById("body").value;
+    location.href = "mailto:" + TO +
+      "?subject=" + encodeURIComponent("Message from " + from) +
+      "&body=" + encodeURIComponent(body + "\n\n— " + from);
+    document.getElementById("sent").style.display = "block";
+  });
+</script>
+</body>
+</html>
