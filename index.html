@@ -106,6 +106,7 @@
     <input id="from" name="from" type="email" required autocomplete="email">
     <label for="body">Message</label>
     <textarea id="body" name="body" required></textarea>
+    <input id="website" name="website" type="text" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px">
     <button type="submit">Send us a message</button>
   </form>
   <p class="sent" id="sent" role="status"></p>
@@ -113,10 +114,8 @@
   <footer>Black page &middot; white dog</footer>
 
 <script>
-  // Delivered by Web3Forms. The access key only allows sending to our inbox;
-  // the recipient address itself never appears in this page.
-  var ENDPOINT = "https://api.web3forms.com/submit";
-  var ACCESS_KEY = "592bc131-4059-4f56-a91b-1bb4adf40403";
+  // Sent to our own server function, which emails it via Resend.
+  var ENDPOINT = "/api/contact";
   var form = document.getElementById("msg");
   var sent = document.getElementById("sent");
   var btn = form.querySelector("button");
@@ -129,16 +128,14 @@
       method: "POST",
       headers: { "Content-Type": "application/json", "Accept": "application/json" },
       body: JSON.stringify({
-        access_key: ACCESS_KEY,
-        subject: "New message from your website",
-        from_name: "Nothing. website",
         email: from,
-        message: body
+        message: body,
+        website: document.getElementById("website").value
       })
     })
     .then(function (r) { return r.json(); })
     .then(function (d) {
-      if (d.success) {
+      if (d.ok) {
         form.style.display = "none";
         sent.textContent = "Sent. Nuffin dog will be in touch.";
         sent.classList.add("done");
